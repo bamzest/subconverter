@@ -1,7 +1,7 @@
 FROM alpine:3.16 AS builder
-LABEL maintainer="metacubex.official@gmail.com"
 ARG THREADS="4"
 ARG SHA=""
+ARG BRANCH="master"
 
 # build minimized
 WORKDIR /
@@ -35,7 +35,7 @@ RUN set -xe && \
     cmake -DCMAKE_CXX_STANDARD=11 . && \
     make install -j $THREADS && \
     cd .. && \
-    git clone https://github.com/metacubex/subconverter --depth=1 && \
+    git clone https://github.com/bamzest/subconverter --branch="$BRANCH" --depth=1 && \
     cd subconverter && \
     [ -n "$SHA" ] && sed -i 's/\(v[0-9]\.[0-9]\.[0-9]\)/\1-'"$SHA"'/' src/version.h;\
     python3 -m ensurepip && \
@@ -46,7 +46,6 @@ RUN set -xe && \
 
 # build final image
 FROM alpine:3.16
-LABEL maintainer="metacubex.official@gmail.com"
 
 RUN apk add --no-cache --virtual subconverter-deps pcre2 libcurl yaml-cpp
 
